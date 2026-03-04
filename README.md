@@ -32,6 +32,8 @@ uv sync
 
 ### 3. Generate the unit data
 
+I've had some issues getting this to work. May need some tweaking.
+
 Run the Jupyter notebook to retrieve unit data from masterunitlist.info and produce a `unit_list.csv` file. This makes thousands of HTTP requests and **will take several hours** to complete.
 
 ```bash
