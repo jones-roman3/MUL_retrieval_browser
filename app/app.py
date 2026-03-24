@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from pathlib import Path
+from mul_service import load_data
 
 st.set_page_config(page_title="Alpha Strike Unit Browser", layout="wide")
 
@@ -17,43 +17,6 @@ ERA_COLS = [
     "Dark Ages (3131 - 3150)",
     "ilClan (3151 - 9999)",
 ]
-
-STAT_COLS = ["PV", "Size", "Short", "Medium", "Long", "Extreme", "Overheat", "Armor", "Structure", "Threshold"]
-
-
-@st.cache_data
-def load_data():
-    # Use the most recently modified unit_list csv
-    data_dir = Path(__file__).parent.parent / "data"
-    csvs = sorted(data_dir.glob("unit_list*.csv"), key=lambda p: p.stat().st_mtime, reverse=True)
-    if not csvs:
-        return None
-    df = pd.read_csv(csvs[0])
-    for col in STAT_COLS:
-        if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0).astype(int)
-    df["Specials"] = df["Specials"].fillna("")
-    df["Variant"] = df["Variant"].fillna("")
-    df["MoveVal"] = df["Move"].str.extract(r"(\d+)").astype(float).fillna(0).astype(int)
-    df["JumpVal"] = df["Move"].str.extract(r"(\d+)\"j").astype(float).fillna(0).astype(int)
-    df["Type"] = df["Type"].str.upper()
-    type_names = {
-        "AF": "Aerospace Fighter",
-        "BA": "Battle Armor",
-        "BD": "Building",
-        "BM": "BattleMech",
-        "CF": "Conventional Fighter",
-        "CI": "Conventional Infantry",
-        "CV": "Combat Vehicle",
-        "IM": "IndustrialMech",
-        "JS": "Jumpship",
-        "PM": "Protomech",
-        "SC": "Small Craft",
-        "SS": "Support Satellite",
-        "SV": "Support Vehicle",
-    }
-    df["Type"] = df["Type"].map(lambda x: type_names.get(x, x))
-    return df, csvs[0].name
 
 
 result = load_data()
